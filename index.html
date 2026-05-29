@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        button {
+            width: 80px;
+            height: 80px;
+            margin: 5px;
+            font-size: 30px;
+            font-weight: bold;
+            border: 3px outset transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color:  rgba(0, 0, 0, 0.2);
+        }
+
+        #resetar {
+            width: 200px;
+            height: 50px;
+            margin-top: 20px;
+            font-size: 18px;
+            background-color: rgb(32, 46, 200);
+            color: white;
+        }
+
+        .placar {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background-color:  rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 2px outset transparent;
+            box-shadow: 5px 10px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .placar h2 {
+            margin: 0 0 10px 0;
+            color: #000000;
+        }
+
+        .placar-container {
+            border-radius: 5px;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .jogador-x {
+            color: #ff0000;
+        }
+
+        .jogador-o {
+            color: #00d307;
+        }
+
+        .pontuacao {
+            font-size: 28px;
+            margin-top: 5px;
+        }
+
+        #resetarPlacar {
+            width: 150px;
+            height: 40px;
+            margin-top: 10px;
+            font-size: 14px;
+            background-color: #2e22d9;
+            color: white;
+            border: 2px black solid;
+        }
+
+        #resetarPlacar:hover {
+            background-color: #888;
+        }
+
+        .container {
+            padding: 10px 5px 10px 15px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            width: 40%;
+            margin-left: 30%;
+            background-color:  rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Jogo da Velha</h1>
+
+    <div class="container">
+
+        <div class="placar">
+            <h2> PLACAR </h2>
+            <div class="placar-container">
+                <div class="jogador-x">
+                    <span id="nomeJogadorX">Jogador X</span><br>
+                    Vitórias: <span id="vitoriasX" class="pontuacao">0</span>
+                </div>
+                <div class="jogador-o">
+                    <span id="nomeJogadorO">Jogador O</span><br>
+                    Vitórias: <span id="vitoriasO" class="pontuacao">0</span>
+                </div>
+            </div>
+            <button id="resetarPlacar" onclick="resetarPlacar()">
+                Zerar Placar
+            </button>
+        </div>
+
+        <h3 id="jogadorAtual">Jogador da vez: X</h3>
+
+        <div>
+            <button id="celula1" onclick="realizarJogada(this)"> - </button>
+            <button id="celula2" onclick="realizarJogada(this)"> - </button>
+            <button id="celula3" onclick="realizarJogada(this)"> - </button>
+        </div>
+
+        <div>
+            <button id="celula4" onclick="realizarJogada(this)"> - </button>
+            <button id="celula5" onclick="realizarJogada(this)"> - </button>
+            <button id="celula6" onclick="realizarJogada(this)"> - </button>
+        </div>
+
+        <div>
+            <button id="celula7" onclick="realizarJogada(this)"> - </button>
+            <button id="celula8" onclick="realizarJogada(this)"> - </button>
+            <button id="celula9" onclick="realizarJogada(this)"> - </button>
+        </div>
+
+        <button id="resetar" onclick="resetarJogo()">
+            Resetar Jogo
+        </button>
+
+    </container>
+    <script>
+        let nome = prompt("Digite o nome do primeiro jogador (X):");
+        let nome2 = prompt("Digite o nome do segundo jogador (O):");
+
+        alert("Olá, " + nome + " e " + nome2 + " vamos jogar!");
+        alert("O " + nome + " será o jogador 'X' e " + nome2 + " será o jogador 'O'.");
+
+        let tabuleiro = [
+            [" ", " ", " "],
+            [" ", " ", " "],
+            [" ", " ", " "]
+        ];
+
+        let jogadorX = true;
+        let jogoFinalizado = false;
+        let resetAutomaticoAgendado = false;
+
+        let vitoriasJogadorX = 0;
+        let vitoriasJogadorO = 0;
+
+        // Atualiza o nome dos jogadores no placar
+        document.getElementById("nomeJogadorX").innerHTML = nome;
+        document.getElementById("nomeJogadorO").innerHTML = nome2;
+
+        document.getElementById("jogadorAtual").innerHTML = "Jogador da vez: X (" + nome + ")";
+
+        function atualizarPlacar() {
+            document.getElementById("vitoriasX").innerHTML = vitoriasJogadorX;
+            document.getElementById("vitoriasO").innerHTML = vitoriasJogadorO;
+        }
+
+        function realizarJogada(button) {
+
+            if (jogoFinalizado) {
+                return;
+            }
+
+            let jogadorAtual = document.getElementById("jogadorAtual");
+
+            if (jogadorX) {
+
+                button.innerHTML = "X";
+                button.style.backgroundColor = "yellow";
+
+                jogadorAtual.innerHTML = "Jogador da vez: O (" + nome2 + ")";
+
+            } else {
+
+                button.innerHTML = "O";
+                button.style.backgroundColor = "lightgreen";
+
+                jogadorAtual.innerHTML = "Jogador da vez: X (" + nome + ")";
+            }
+
+            button.disabled = true;
+
+            if (button.id === "celula1") {
+                tabuleiro[0][0] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula2") {
+                tabuleiro[0][1] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula3") {
+                tabuleiro[0][2] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula4") {
+                tabuleiro[1][0] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula5") {
+                tabuleiro[1][1] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula6") {
+                tabuleiro[1][2] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula7") {
+                tabuleiro[2][0] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula8") {
+                tabuleiro[2][1] = jogadorX ? "X" : "O";
+
+            } else if (button.id === "celula9") {
+                tabuleiro[2][2] = jogadorX ? "X" : "O";
+            }
+
+            console.log(tabuleiro);
+
+            if (verificaGanhador()) {
+                jogoFinalizado = true;
+
+                let vencedor = jogadorX ? "X" : "O";
+                let nomeVencedor = jogadorX ? nome : nome2;
+
+                if (jogadorX) {
+                    vitoriasJogadorX++;
+                } else {
+                    vitoriasJogadorO++;
+                }
+                atualizarPlacar();
+
+                setTimeout(() => {
+                    alert("Parabéns " + nomeVencedor + "! Você ganhou!\n\n");
+                }, 100);
+
+                // Reset apos 2 segundos
+                if (!resetAutomaticoAgendado) {
+                    resetAutomaticoAgendado = true;
+                    setTimeout(() => {
+                        resetarJogo();
+                        resetAutomaticoAgendado = false;
+                    }, 2000);
+                }
+
+                return;
+            }
+
+            if (verificaVelha()) {
+
+                jogoFinalizado = true;
+
+                setTimeout(() => {
+                    alert(" Deu velha! \n\n");
+                }, 100);
+
+                // Reset apos 2 segundos
+                if (!resetAutomaticoAgendado) {
+                    resetAutomaticoAgendado = true;
+                    setTimeout(() => {
+                        resetarJogo();
+                        resetAutomaticoAgendado = false;
+                    }, 2000);
+                }
+
+                return;
+            }
+
+            jogadorX = !jogadorX;
+        }
+
+        function verificaGanhador() {
+
+            return (
+
+                // Linhas da tabela
+                (tabuleiro[0][0] === tabuleiro[0][1] &&
+                    tabuleiro[0][1] === tabuleiro[0][2] &&
+                    tabuleiro[0][0] !== " ") ||
+
+                (tabuleiro[1][0] === tabuleiro[1][1] &&
+                    tabuleiro[1][1] === tabuleiro[1][2] &&
+                    tabuleiro[1][0] !== " ") ||
+
+                (tabuleiro[2][0] === tabuleiro[2][1] &&
+                    tabuleiro[2][1] === tabuleiro[2][2] &&
+                    tabuleiro[2][0] !== " ") ||
+
+                // Colunas da tabela
+                (tabuleiro[0][0] === tabuleiro[1][0] &&
+                    tabuleiro[1][0] === tabuleiro[2][0] &&
+                    tabuleiro[0][0] !== " ") ||
+
+                (tabuleiro[0][1] === tabuleiro[1][1] &&
+                    tabuleiro[1][1] === tabuleiro[2][1] &&
+                    tabuleiro[0][1] !== " ") ||
+
+                (tabuleiro[0][2] === tabuleiro[1][2] &&
+                    tabuleiro[1][2] === tabuleiro[2][2] &&
+                    tabuleiro[0][2] !== " ") ||
+
+                // Diagonais da tabela
+                (tabuleiro[0][0] === tabuleiro[1][1] &&
+                    tabuleiro[1][1] === tabuleiro[2][2] &&
+                    tabuleiro[0][0] !== " ") ||
+
+                (tabuleiro[0][2] === tabuleiro[1][1] &&
+                    tabuleiro[1][1] === tabuleiro[2][0] &&
+                    tabuleiro[0][2] !== " ")
+
+            );
+
+        }
+
+        function verificaVelha() {
+
+            for (let i = 0; i < 3; i++) {
+
+                for (let j = 0; j < 3; j++) {
+
+                    if (tabuleiro[i][j] === " ") {
+                        return false;
+                    }
+
+                }
+
+            }
+
+            return true;
+        }
+
+        function resetarJogo() {
+
+            tabuleiro = [
+                [" ", " ", " "],
+                [" ", " ", " "],
+                [" ", " ", " "]
+            ];
+
+            jogadorX = true;
+            jogoFinalizado = false;
+
+            document.getElementById("jogadorAtual").innerHTML =
+                "Jogador da vez: X (" + nome + ")";
+
+            let botoes = document.querySelectorAll("button");
+
+            botoes.forEach(botao => {
+
+                if (botao.id !== "resetar" && botao.id !== "resetarPlacar") {
+
+                    botao.innerHTML = "-";
+                    botao.disabled = false;
+                    botao.style.backgroundColor = "";
+
+                }
+
+            });
+
+            console.log("Jogo resetado! Nova partida iniciada.");
+        }
+
+        function resetarPlacar() {
+            if (confirm("Tem certeza que deseja zerar o placar?")) {
+                vitoriasJogadorX = 0;
+                vitoriasJogadorO = 0;
+                atualizarPlacar();
+                alert("Placar zerado!");
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
